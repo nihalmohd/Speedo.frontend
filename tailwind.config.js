@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        squada: ['Squada One', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }
