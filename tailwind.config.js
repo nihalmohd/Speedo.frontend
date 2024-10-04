@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         squada: ['Squada One', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
     },
   },
