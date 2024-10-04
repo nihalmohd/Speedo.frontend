@@ -1,7 +1,10 @@
 import React from 'react'
 import Navbar from '../Navbar/Navbar'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
+
+const navigate = useNavigate()
   return (
     <div>
         <Navbar/>
@@ -23,7 +26,7 @@ const Home = () => {
                 </div>
                 <div className="w-full h-24  ">
                     <div className="w-full h-14  flex justify-center">
-                    <button className='w-[186px] h-[52px] bg-[#162D3A] rounded-md text-white'>Upload trip</button>
+                    <button className='w-[186px] h-[52px] bg-[#162D3A] rounded-md text-white' onClick={()=>{navigate("/Modal")}}>Upload trip</button>
                     </div>
                     <div className="w-full h-10  flex justify-center items-center">
                         <h1 className='font-roboto text-[14px] bold-[400] text-[#9C9C9C] '>Upload the  <span className='underline cursor-pointer'>Excel</span> sheet of your trip</h1>
