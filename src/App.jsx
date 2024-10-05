@@ -5,7 +5,7 @@ import Login from './assets/Components/pages/Login'
 import Home from './assets/Components/pages/Home'
 import Modal from './assets/Components/Modal/Modal'
 import Map from './assets/Components/pages/Map'
-import Check from './assets/Components/pages/Check'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -17,7 +17,6 @@ function App() {
         <Route path='/Home' element={<Home/>}></Route>
         <Route path='/Modal' element={<Modal/>}></Route>
         <Route path='/Map' element={<Map/>}></Route>
-        <Route path='/Check' element={<Check/>}></Route>
       </Routes>
      </Router>
   )
