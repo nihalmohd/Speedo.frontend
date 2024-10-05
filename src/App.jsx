@@ -5,6 +5,7 @@ import Login from './assets/Components/pages/Login'
 import Home from './assets/Components/pages/Home'
 import Modal from './assets/Components/Modal/Modal'
 import Map from './assets/Components/pages/Map'
+import Mapintergration from './assets/Components/pages/Mapintergration'
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path='/Home' element={<Home/>}></Route>
         <Route path='/Modal' element={<Modal/>}></Route>
         <Route path='/Map' element={<Map/>}></Route>
+        <Route path='/Mop' element={<Mapintergration/>}></Route>
       </Routes>
      </Router>
   )

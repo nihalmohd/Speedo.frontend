@@ -7,7 +7,7 @@ import Pagination from '../Pagingation/Pagination'
 const Home = () => {
 
     const navigate = useNavigate()
-    const [Tripcount,setTripCount] = useState(8)
+    const [Tripcount,setTripCount] = useState(0)
     return (
         <div>
             <Navbar />

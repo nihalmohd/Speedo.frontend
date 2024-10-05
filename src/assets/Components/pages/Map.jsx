@@ -6,6 +6,8 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import { FaClock } from "react-icons/fa6";
 import { MdLocationPin } from "react-icons/md";
 import Pagination from '../Pagingation/Pagination';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 
@@ -13,9 +15,10 @@ import Pagination from '../Pagingation/Pagination';
 
 const Map = () => {
     const [activeIndex, setActiveIndex] = useState(0);
-
+    const position = [40.7128, -74.0060];
     // Your list of names for the navbar
     const Tripnames = ['Colaba', 'Marain drive', 'Nariman Point', 'Malabar Hills', 'Bandra', 'Anderi'];
+
     return (
         <div>
             <Navbar />
@@ -50,7 +53,24 @@ const Map = () => {
                             <h1 className='font-roboto text-[14px]'>Over speeding</h1>
                         </div>
                     </div>
-                    <div className="w-full h-96  mt-2 border border-black">Map</div>
+                    <div className="w-full h-96  mt-2 border border-black">
+                        <div className="w-full h-full">
+                            <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                                {/* Tile Layer for the map (you can use different providers like OpenStreetMap, Google Maps, etc.) */}
+                                <TileLayer
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                />
+
+                                {/* Marker at the specified position */}
+                                <Marker position={position}>
+                                    <Popup>
+                                        A marker at New York City!
+                                    </Popup>
+                                </Marker>
+                            </MapContainer>
+                        </div>
+                    </div>
                     <div className="w-full h-16  flex items-end  ">
                         <div className="w-full h-7 flex justify-between items-center border-b-2 border-[#E0E0E0]">
                             <div className="flex  space-x-8">
@@ -171,11 +191,11 @@ const Map = () => {
                                     <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">On</td>
                                     <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">28.5 KM/H</td>
                                     <td className="px-4 py-2 font-roboto text-[14px] ">
-                                    <div className="w-full h-3 bg-red-200 flex justify-center items-center">
+                                        <div className="w-full h-3 flex justify-center items-center">
                                             Travel Duration :20 Mins
-                                            </div><div className="w-full h-3 bg-red-200 flex justify-center items-center">
+                                        </div><div className="w-full h-3  flex justify-center items-center">
                                             Travel Duration :20 Mins
-                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
 
@@ -190,7 +210,7 @@ const Map = () => {
                         </table>
                     </div>
                     <div className="w-full h-10 ">
-                        <Pagination/>
+                        <Pagination />
                     </div>
                 </div>
             </div>

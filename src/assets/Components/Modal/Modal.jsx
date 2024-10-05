@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { GoUpload } from "react-icons/go";
 import { IoIosClose } from "react-icons/io";
 import { useNavigate } from 'react-router-dom'
 import { useRef } from 'react';
+import * as XLSX from 'xlsx';
+import { getDistance } from 'geolib';
 
 const Modal = () => {
     const navigate = useNavigate()
@@ -10,6 +12,89 @@ const Modal = () => {
     const handleDivClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click(); // Programmatically click the file input
+        }
+        const [fileData, setFileData] = useState(null);
+        const [report, setReport] = useState(null);
+        const speedLimit = 60; // Define your speed limit for over-speeding
+
+        const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+                setFileData(worksheet); // Store the parsed Excel data
+                calculateMetrics(worksheet);
+            };
+
+            reader.readAsArrayBuffer(file);
+        };
+
+        const calculateMetrics = (data) => {
+            let totalDistance = 0;
+            let totalDuration = 0;
+            let overSpeedDuration = 0;
+            let overSpeedDistance = 0;
+            let stoppedDuration = 0;
+
+            let lastPoint = null;
+            let overSpeedStart = null;
+            let stopStart = null;
+
+            data.forEach((row, index) => {
+                const { latitude, longitude, timestamp, speed, ignition } = row;
+
+                // Parse the timestamp into a Date object
+                const currentTime = new Date(timestamp);
+
+                // Calculate distance from last point
+                if (lastPoint) {
+                    const distance = getDistance(
+                        { latitude: lastPoint.latitude, longitude: lastPoint.longitude },
+                        { latitude, longitude }
+                    );
+                    totalDistance += distance; // Total distance traveled
+
+                    const timeDiff = (currentTime - lastPoint.time) / 1000; // Time difference in seconds
+                    totalDuration += timeDiff; // Total travel duration
+
+                    // Check for over-speeding
+                    if (speed > speedLimit) {
+                        if (!overSpeedStart) overSpeedStart = lastPoint.time; // Start of over-speeding
+                        overSpeedDistance += distance; // Add distance traveled while over-speeding
+                        overSpeedDuration += timeDiff; // Add time spent over-speeding
+                    } else {
+                        overSpeedStart = null; // End of over-speeding
+                    }
+
+                    // Check for stopped duration
+                    if (speed === 0 && ignition === 'on') {
+                        if (!stopStart) stopStart = lastPoint.time;
+                        stoppedDuration += timeDiff;
+                    } else {
+                        stopStart = null; // End of stop
+                    }
+                }
+
+                lastPoint = {
+                    latitude,
+                    longitude,
+                    time: currentTime,
+                };
+            });
+
+            // Set calculated results
+            setReport({
+                totalDistance: (totalDistance / 1000).toFixed(2), // Convert to km
+                totalDuration: (totalDuration / 3600).toFixed(2), // Convert to hours
+                overSpeedDuration: (overSpeedDuration / 3600).toFixed(2), // Convert to hours
+                overSpeedDistance: (overSpeedDistance / 1000).toFixed(2), // Convert to km
+                stoppedDuration: (stoppedDuration / 3600).toFixed(2), // Convert to hours
+            });
         }
     };
     return (
@@ -31,7 +116,7 @@ const Modal = () => {
                                     <div className="w-full h-10 ">
                                         <input type="text" className=' w-full h-full border border-[#949494] rounded-md font-roboto text-[16px] pl-2' placeholder='Trip Name* ' />
                                     </div>
-                                    <div className="w-full h-32 b mt-9 border-2 border-[#00B2FF] rounded-md"  onClick={handleDivClick}>
+                                    <div className="w-full h-32 b mt-9 border-2 border-[#00B2FF] rounded-md" onClick={handleDivClick}>
                                         <div className="w-full h-24  flex justify-center items-center">
                                             <div className="w-20 h-20 ">
                                                 <GoUpload className='w-20 h-20 text-[#00B2FF]' />
