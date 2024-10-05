@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import Navbar from '../Navbar/Navbar'
 import { useNavigate } from 'react-router-dom'
+import Pagination from '../Pagingation/Pagination'
 
 
 const Home = () => {
 
     const navigate = useNavigate()
-    const [Tripcount,setTripCount] = useState(1)
+    const [Tripcount,setTripCount] = useState(8)
     return (
         <div>
             <Navbar />
@@ -88,6 +89,13 @@ const Home = () => {
 
 
                                 </div>
+                                
+                                {
+                                    Tripcount>5?(<>
+                                    <Pagination/>
+                                    </>)
+                                    :(<></>)
+                                }
                             </>)
                     }
 
