@@ -42,7 +42,7 @@ const Home = () => {
                         </>) :
                             (<>
                                 <div className="w-full h-16  border-2 border-[#A9A9A9] rounded-xl mt-2 flex justify-center items-center ">
-                                    <button className="w-3/12 h-10  flex justify-center items-center bg-[#162D3A] ml-2 rounded-md text-white font-roboto" onClick={() => { navigate("/Home") }}>
+                                    <button className="w-3/12 h-10  flex justify-center items-center bg-[#162D3A] ml-2 rounded-md text-white font-roboto" onClick={() => { navigate("/Modal") }}>
                                         Upload Trip
                                     </button>
                                     <div className="w-full h-full  flex justify-start items-center ml-2">
@@ -55,7 +55,7 @@ const Home = () => {
                                     </div>
                                     <div className="w-1/2 h-full  flex justify-end items-center gap-2">
                                         <button className="w-3/12 h-8  rounded-md border border-[#162D3A] font-roboto hover:bg-[#162D3A] hover:text-white"> Delete</button>
-                                        <button className="w-3/12 h-8 bg-[#162D3A] rounded-md text-white font-roboto hover:border hover:border-[#162D3A] hover:bg-white hover:text-black ">Open</button>
+                                        <button className="w-3/12 h-8 bg-[#162D3A] rounded-md text-white font-roboto hover:border hover:border-[#162D3A] hover:bg-white hover:text-black " onClick={()=>{navigate('/Map')}}>Open</button>
                                     </div>
                                 </div>
                                 <div className="w-full h-10 bg-[#FAFAFA] flex items-center p-2">
@@ -72,7 +72,7 @@ const Home = () => {
                                     </label>
 
                                     <div className="w-full h-full  ml-3 flex items-center">
-                                        <h1 className='font-roboto text-[14px] text-[#000000D9] '>Trips</h1>
+                                        <h1 className='font-roboto text-[14px] text-[#000000D9] '>Banglore-Mysore</h1>
                                     </div>
 
 
@@ -83,7 +83,7 @@ const Home = () => {
                                     </label>
 
                                     <div className="w-full h-full= ml-3 flex items-center">
-                                        <h1 className='font-roboto text-[14px] text-[#000000D9] '>Trips</h1>
+                                        <h1 className='font-roboto text-[14px] text-[#000000D9] '>Banglore-Mysore</h1>
                                     </div>
 
 
