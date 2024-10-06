@@ -8,6 +8,7 @@ import { MdLocationPin } from "react-icons/md";
 import Pagination from '../Pagingation/Pagination';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -18,13 +19,14 @@ const Map = () => {
     const position = [40.7128, -74.0060];
     // Your list of names for the navbar
     const Tripnames = ['Colaba', 'Marain drive', 'Nariman Point', 'Malabar Hills', 'Bandra', 'Anderi'];
+    const navigate = useNavigate()
 
     return (
         <div>
             <Navbar />
             <div className="w-full h-auto    flex justify-center items-center">
                 <div className="w-9/12 h-full  ">
-                    <div className="w-full h-8  mt-2">
+                    <div className="w-full h-8  mt-2 " onClick={()=>{navigate('/Home')}}>
                         <div className="w-10 h-8  flex justify-center items-center">
                             <h1 className='text-xl font-bold'><FaArrowLeft /></h1>
                         </div>
@@ -175,22 +177,22 @@ const Map = () => {
                             {/* Table Head */}
                             <thead>
                                 <tr className="bg-[#FAFAFA]">
-                                    <th className="border border-gray-300 px-4 py-2 w-2/12 font-roboto text-[14px]">Time</th>
-                                    <th className="border border-gray-300 px-4 py-2 w-52 font-roboto text-[14px]">Point</th>
-                                    <th className="border border-gray-300 px-4 py-2 w-16 font-roboto text-[14px]">Ignition</th>
-                                    <th className="border border-gray-300 px-4 py-2 w-28 font-roboto text-[14px]">Speed</th>
-                                    <th className="border border-gray-300 px-4 py-2 font-roboto text-[14px]"></th>
+                                    <th className="border border-gray-300 px-4 py-2 w-2/12 font-roboto text-[13px]">Time</th>
+                                    <th className="border border-gray-300 px-4 py-2 w-52 font-roboto text-[13px]">Point</th>
+                                    <th className="border border-gray-300 px-4 py-2 w-16 font-roboto text-[13px]">Ignition</th>
+                                    <th className="border border-gray-300 px-4 py-2 w-28 font-roboto text-[13px]">Speed</th>
+                                    <th className="border border-gray-300 px-4 py-2 font-roboto text-[13px]"></th>
                                 </tr>
                             </thead>
 
                             {/* Table Body */}
                             <tbody>
                                 <tr className="text-center">
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">11:30:24 PM</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">40.7128° N, 74.0060° W</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">On</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">28.5 KM/H</td>
-                                    <td className="px-4 py-2 font-roboto text-[14px] ">
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">11:30:24 PM</td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">40.7128° N, 74.0060° W</td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">On</td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">28.5 KM/H</td>
+                                    <td className="px-4 py-2 font-roboto text-[12px] ">
                                         <div className="w-full h-3 flex justify-center items-center">
                                             Travel Duration :20 Mins
                                         </div><div className="w-full h-3  flex justify-center items-center">
@@ -200,10 +202,10 @@ const Map = () => {
                                 </tr>
 
                                 <tr className="text-center">
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">11:30:24 PM</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">40.7128° N, 74.0060° W</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]"></td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[14px]">28.5 KM/H</td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">11:30:24 PM</td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">40.7128° N, 74.0060° W</td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]"></td>
+                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">28.5 KM/H</td>
                                     {/* <td className="border border-gray-300 px-4 py-2"></td> */}
                                 </tr>
                             </tbody>

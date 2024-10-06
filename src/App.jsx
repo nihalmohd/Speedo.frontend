@@ -6,6 +6,7 @@ import Home from './assets/Components/pages/Home'
 import Modal from './assets/Components/Modal/Modal'
 import Map from './assets/Components/pages/Map'
 import Mapintergration from './assets/Components/pages/Mapintergration'
+import ExcelDataProcessor from './assets/Components/pages/ExcelDataProcessor'
 
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
         <Route path='/Home' element={<Home/>}></Route>
         <Route path='/Modal' element={<Modal/>}></Route>
         <Route path='/Map' element={<Map/>}></Route>
-        <Route path='/Mop' element={<Mapintergration/>}></Route>
+        <Route path='/Mop' element={<ExcelDataProcessor/>}></Route>
       </Routes>
      </Router>
   )
