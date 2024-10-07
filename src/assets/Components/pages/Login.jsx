@@ -1,24 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async(e) => {
         e.preventDefault(); // Prevents page reload on submit
-
+  
         // Simple validation
         if (!email || !password) {
             alert("Both fields are required!");
             return;
         }
-
+        
         if (password.length < 8) {
             alert("Password must be at least 8 characters long");
             return;
         }
+        try {
+            console.log("Here is ok");
+            console.log(email,password);
+            const response = await axios.post('http://localhost:5000/Login', {
+                email,
+                password
+              });
+            localStorage.setItem("User",JSON.stringify(response.data))
+            console.log('Login successful:', response.data);
+          } catch (error) {
+            console.error('Error logging in:', error);
+          }
          
         navigate("/Home");
     };
@@ -41,7 +56,7 @@ const Login = () => {
                         </div>
                         <div className="w-full h-60 flex justify-center items-center mt-4">
                             <div className="w-9/12 h-full grid grid-rows-3 gap-4">
-                                <form onSubmit={handleSubmit}>
+                                <form >
                                     <div className="w-full h-20">
                                         <div className="w-1/2 h-7 mb-2">
                                             <label htmlFor="email">Email</label>
@@ -78,6 +93,7 @@ const Login = () => {
                                         <button
                                             type="submit"
                                             className="w-full h-10 bg-black rounded-md text-white font-semibold text-xl"
+                                            onClick={handleSubmit}
                                         >
                                             Sign in
                                         </button>
