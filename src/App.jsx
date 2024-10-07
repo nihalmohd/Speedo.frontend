@@ -7,6 +7,7 @@ import Modal from './assets/Components/Modal/Modal'
 import Map from './assets/Components/pages/Map'
 import Mapintergration from './assets/Components/pages/Mapintergration'
 import ExcelDataProcessor from './assets/Components/pages/ExcelDataProcessor'
+import UserProtectedRouter from './assets/Components/ProtectedRouter/Protectedrouter'
 
 
 function App() {
@@ -16,10 +17,10 @@ function App() {
      <Router>
       <Routes>
         <Route path='/' element={<Login/>}></Route>
-        <Route path='/Home' element={<Home/>}></Route>
-        <Route path='/Modal' element={<Modal/>}></Route>
-        <Route path='/Map' element={<Map/>}></Route>
-        <Route path='/Mop' element={<ExcelDataProcessor/>}></Route>
+        <Route path='/Home' element={<UserProtectedRouter><Home/></UserProtectedRouter>}></Route>
+        <Route path='/Modal' element={<UserProtectedRouter><Modal/></UserProtectedRouter>}></Route>
+        <Route path='/Map' element={<UserProtectedRouter><Map/></UserProtectedRouter>}></Route>
+        {/* <Route path='/Mop' element={<ExcelDataProcessor/>}></Route> */}
       </Routes>
      </Router>
   )
