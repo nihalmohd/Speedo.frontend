@@ -9,12 +9,12 @@ import axios from 'axios';
 const Modal = () => {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
-    const [tripName, settripName] = useState(null)
+    const [tripName, settripName] = useState(null);
     const [fileData, setFileData] = useState(null);
     const [report, setReport] = useState(null);
     const speedLimit = 60; // Speed limit for over-speeding
 
-    const userId = localStorage.getItem("User")
+    const userId = localStorage.getItem("User");
     console.log(tripName);
     const cleanUserId = userId.replace(/['"]/g, '');
 
@@ -34,6 +34,8 @@ const Modal = () => {
         overSpeedDistance: 0,
         stoppedDuration: 0,
     });
+
+    const [locations, setLocations] = useState([]); // State to store locations
 
     const SPEED_LIMIT = 60; // Speed limit in km/h
 
@@ -59,6 +61,7 @@ const Modal = () => {
         let overSpeedDur = 0;
         let overSpeedDist = 0;
         let stoppedDur = 0;
+        const locs = []; // Temporary array to hold locations
 
         let prevLat = null;
         let prevLong = null;
@@ -83,6 +86,9 @@ const Modal = () => {
                 console.error(`Invalid timestamp at row ${index + 1}: ${timestamp}`);
                 return; // Skip this row if the timestamp is invalid
             }
+
+            // Add current location to locs array
+            locs.push({ latitude, longitude });
 
             // Calculate distance and duration only if previous data exists
             if (prevLat !== null && prevLong !== null && prevTimestamp !== null) {
@@ -116,7 +122,6 @@ const Modal = () => {
             prevIgnition = ignition;
         });
 
-
         setResults({
             TotalDistanceTravelled: totalDistance,
             totalDuration: totalDuration,
@@ -124,12 +129,13 @@ const Modal = () => {
             overSpeedDistance: overSpeedDist,
             stoppedDuration: stoppedDur,
         });
-        console.log(stoppedDur, "this is sotped ");
-        console.log(overSpeedDist, "this is sotped ");
-        console.log(overSpeedDur, "this is sotped ");
-        console.log(totalDuration, "this is sotped ");
-        console.log(totalDistance, "this is sotped ");
 
+        setLocations(locs); // Set locations state
+        console.log(stoppedDur, "this is stopped ");
+        console.log(overSpeedDist, "this is overspeed distance ");
+        console.log(overSpeedDur, "this is overspeed duration ");
+        console.log(totalDuration, "this is total duration ");
+        console.log(totalDistance, "this is total distance ");
     };
 
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -152,26 +158,26 @@ const Modal = () => {
         const minutes = Math.floor((seconds % 3600) / 60);
         return `${hours} hr ${minutes} min`;
     };
+
     const submitMapData = async (userId, tripName, report) => {
         try {
-            
-
             const mapData = {
-                userId :cleanUserId,
+                userId: cleanUserId,
                 tripName,
                 totalDistanceTravelled: results.TotalDistanceTravelled,
                 totalDuration: results.totalDuration,
                 overSpeedDuration: results.overSpeedDuration,
                 overSpeedDistance: results.overSpeedDistance,
-                stoppedDuration: results.stoppedDuration
+                stoppedDuration: results.stoppedDuration,
+                locations 
             };
 
             const response = await axios.post('http://localhost:5000/mapdata', mapData);
             if (response) {
-                alert("Data Added sucessfully")
-                navigate("/Home")
-            }else{
-                console.log("Network error")
+                alert("Data Added successfully");
+                navigate("/Home");
+            } else {
+                console.log("Network error");
             }
 
             console.log('Data successfully submitted:', response.data);
@@ -191,7 +197,7 @@ const Modal = () => {
                         <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                             <div className="bg-white">
                                 <div className="w-full h-10 flex justify-end items-end">
-                                    <div className="w-8 h-8 text-[#162D3A]" onClick={() => navigate('/Home')}>
+                                    <div className="w-8 h-8 text-[#162D3A]" onClick={() => navigate(-1)}>
                                         <IoIosClose className='w-8 h-8' />
                                     </div>
                                 </div>

@@ -6,7 +6,7 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import { FaClock } from "react-icons/fa6";
 import { MdLocationPin } from "react-icons/md";
 import Pagination from '../Pagingation/Pagination';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
@@ -20,7 +20,8 @@ import axios from 'axios';
 
 const Map = () => {
     const [activeIndex, setActiveIndex] = useState(0);
-    const position = [40.7128, -74.0060];
+    // const [position, setPosition] = useState([40.7128, -74.0060]);
+    const [position, setPosition] = useState(null); 
     // Your list of names for the navbar
     const [selectedData, setSelectedData] = useState(null);
     const [Tripnames, setTripnames] = useState([]);
@@ -30,11 +31,12 @@ const Map = () => {
     console.log(
         selectedData
     );
+    console.log(position, "this is posstion ");
 
     const handleOpenMouting = async () => {
         try {
             const response = await axios.post('http://localhost:5000/getdocuments', { ids: selectedIds });
-
+            
             if (response) {
                 console.log('Documents received:', response.data);
                 const tripNamesArray = response.data.map((item) => ({
@@ -43,7 +45,7 @@ const Map = () => {
                 }));
                 handleTripClick(response.data[0]._id)
                 setTripnames(tripNamesArray);
-
+                
             } else {
                 console.error('Error fetching documents:', response.status);
             }
@@ -51,11 +53,11 @@ const Map = () => {
             console.error('Error fetching documents:', error);
         }
     };
-
+    
     const handleTripClick = async (id) => {
         try {
             const response = await axios.get(`http://localhost:5000/gettrip/${id}`);
-
+            
             if (response) {
                 setSelectedData(response.data.trip); // Save fetched trip data
             } else {
@@ -75,7 +77,23 @@ const Map = () => {
     //   useEffect(()=>{
 
     //   },[])
-
+    const formatDuration = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${hours} hr ${minutes} min`;
+    };
+    const getPolylineColor = (speed, ignition) => {
+        if (ignition === 'off') return '#FF00B8'; // Pink for idle
+        if (speed > 60) return '#00FFD1'; // Skyblue for overspeed
+        return '#0038FF'; // Blue for normal driving
+    };
+    useEffect(() => {
+        if (selectedData && Array.isArray(selectedData.locations) && selectedData.locations.length > 0) {
+            const firstLocation = selectedData.locations[0];
+            setPosition([firstLocation.latitude, firstLocation.longitude]); // Set the position to the first location
+            console.log('Position set to:', [firstLocation.latitude, firstLocation.longitude]); // Debugging: Check the position
+        }
+    }, [selectedData]);
     return (
         <div>
             <Navbar />
@@ -112,24 +130,43 @@ const Map = () => {
                             <h1 className='font-roboto text-[14px]'>Over speeding</h1>
                         </div>
                     </div>
-                    <div className="w-full h-96  mt-2 border border-black">
+                    <div className="w-full h-96 mt-2 border border-black">
                         <div className="w-full h-full">
-                            <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                                {/* Tile Layer for the map (you can use different providers like OpenStreetMap, Google Maps, etc.) */}
-                                <TileLayer
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                />
-
-                                {/* Marker at the specified position */}
-                                <Marker position={position}>
-                                    <Popup>
-                                        A marker at New York City!
-                                    </Popup>
-                                </Marker>
-                            </MapContainer>
+                            {position ? ( // Check if position is available
+                                <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                                    <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    />
+                                    {/* Marker for the first location */}
+                                    <Marker position={position} icon={new L.Icon({ iconUrl: 'path_to_entry_icon.png', iconSize: [25, 41] })}>
+                                        <Popup>Entry Location</Popup>
+                                    </Marker>
+                                    {/* Draw polylines for all locations */}
+                                    {selectedData?.locations.map((location, index) => {
+                                        const nextLocation = selectedData.locations[index + 1];
+                                        if (nextLocation) {
+                                            const polylinePositions = [
+                                                [location.latitude, location.longitude],
+                                                [nextLocation.latitude, nextLocation.longitude]
+                                            ];
+                                            return (
+                                                <Polyline
+                                                    key={index}
+                                                    positions={polylinePositions}
+                                                    color={getPolylineColor(location.speed, location.ignition)}
+                                                    weight={5}
+                                                />
+                                            );
+                                        }
+                                        return null; // No line to draw for the last point
+                                    })}
+                                </MapContainer>
+                            ) : (
+                                <div>Loading map...</div> // Loading state if position is not set
+                            )}
                         </div>
-                    </div>
+                </div>
                     <div className="w-full h-16  flex items-end  ">
                         <div className="w-full h-7 flex justify-between items-center border-b-2 border-[#E0E0E0]">
                             <div className="flex  space-x-8">
@@ -163,15 +200,15 @@ const Map = () => {
                         </div>
                     </div>
 
-                    <div className="w-full h-44  flex  items-end">
-                        <div className="w-full h-40  grid grid-cols-5 gap-2 pt-2">
+                    <div className="w-full md:h-44  flex  items-end">
+                        <div className="w-full md:h-40  md:    grid md:grid-cols-5 gap-2 pt-2">
                             <div className="w-auto h-24 border border-[#A9A9A9] rounded-md ">
                                 <div className="w-full h-8  mt-1">
                                     <div className="w-8 h-8  ml-1 ">
                                         <h1 className='w-full h-full text-lg text-[#00B2FF] flex justify-center items-center '><MdLocationPin /></h1>
                                     </div>
                                     <div className="w-full h-8  flex justify-center items-center">
-                                        <h1 className='font-roboto text-[20px] font-semibold '>63 KM</h1>
+                                        <h1 className='font-roboto text-[20px] font-semibold '>{selectedData ? selectedData.totalDistanceTravelled.toFixed(2) : 'Loading...'} KM</h1>
                                     </div>
                                     <div className="w-full h-5  flex justify-center items-start">
                                         <h1 className=' font-roboto text-[13px] '>Total Distanced Travelled </h1>
@@ -184,7 +221,7 @@ const Map = () => {
                                         <h1 className='w-full h-full flex justify-center text-[#00B2FF] items-center '><FaClock /></h1>                                    </div>
                                 </div>
                                 <div className="w-full h-8  flex justify-center items-center">
-                                    <h1 className='font-roboto text-[20px] font-semibold '>1 Hr 36 Mns</h1>
+                                    <h1 className='font-roboto text-[20px] font-semibold '>{formatDuration(selectedData ? selectedData.totalDuration : 'Loading...')}</h1>
                                 </div>
                                 <div className="w-full h-5  flex justify-center items-start">
                                     <h1 className=' font-roboto text-[13px] '>Total Travelled Duration  </h1>
@@ -196,7 +233,7 @@ const Map = () => {
                                         <h1 className='w-full h-full flex justify-center text-[#00FFD1] items-center '><FaClock /></h1>                                    </div>
                                 </div>
                                 <div className="w-full h-8  flex justify-center items-center">
-                                    <h1 className='font-roboto text-[20px] font-semibold '>41 Mns</h1>
+                                    <h1 className='font-roboto text-[20px] font-semibold '>{formatDuration(selectedData ? selectedData.overSpeedDuration : 'Loading...')}</h1>
                                 </div>
                                 <div className="w-full h-5  flex justify-center items-start">
                                     <h1 className=' font-roboto text-[13px] '>Over Speeding Duration  </h1>
@@ -208,7 +245,7 @@ const Map = () => {
                                         <h1 className='w-full h-full flex justify-center text-xl items-center text-[#00FFD1] '><MdLocationPin /></h1>                                    </div>
                                 </div>
                                 <div className="w-full h-8  flex justify-center items-center">
-                                    <h1 className='font-roboto text-[20px] font-semibold '>20.3 KM</h1>
+                                    <h1 className='font-roboto text-[20px] font-semibold '>{selectedData ? selectedData.overSpeedDistance.toFixed() : 'Loading...'} KM</h1>
                                 </div>
                                 <div className="w-full h-5  flex justify-center items-start">
                                     <h1 className=' font-roboto text-[13px] '>Over Speeding Distance  </h1>
@@ -220,7 +257,7 @@ const Map = () => {
                                         <h1 className='w-full h-full flex justify-center items-center text-[#0038FF] '><FaClock /></h1>                                    </div>
                                 </div>
                                 <div className="w-full h-8  flex justify-center items-center">
-                                    <h1 className='font-roboto text-[20px] font-semibold '>41 Mins</h1>
+                                    <h1 className='font-roboto text-[20px] font-semibold '>{formatDuration(selectedData ? selectedData.stoppedDuration : 'Loading...')}</h1>
                                 </div>
                                 <div className="w-full h-5  flex justify-center items-start">
                                     <h1 className=' font-roboto text-[13px] '>Stopped Duration  </h1>
@@ -230,7 +267,7 @@ const Map = () => {
                         </div>
 
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto mt-2 md:mt-0">
                         <table className="min-w-full border-collapse border border-gray-300">
                             {/* Table Head */}
                             <thead>

@@ -34,6 +34,28 @@ const Home = () => {
         }
     };
 
+    const deleteTrip = async () => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this trip?");
+        
+        if (!confirmDelete) return; // Exit if the user cancels
+    
+        try {
+            const response = await axios.delete("http://localhost:5000/deletedocuments", {
+                data: { ids: selectedIds }, // Correctly format the data
+            });
+    
+            if (response) {
+                alert("Trip deleted successfully"); // Notify the user
+                navigate("/Home"); 
+            } else {
+                console.log("Something went wrong");
+            }
+        } catch (error) {
+            console.error('Error deleting trip:', error);
+            alert('Failed to delete trip: ' + error.message); // Provide more detailed feedback
+        }
+    };
+
     useEffect(() => {
         fetchAllMapData(cleanUserId)
     }, [])
@@ -45,16 +67,16 @@ const Home = () => {
         const { value, checked } = e.target;
     
         if (checked) {
-          // Add the checked ID to selectedIds array
+          
           setSelectedIds((prevSelectedIds) => [...prevSelectedIds, value]);
         } else {
-          // Remove the unchecked ID from selectedIds array
+        
           setSelectedIds((prevSelectedIds) => prevSelectedIds.filter((id) => id !== value));
         }
       };
 
       const handleOpenButtonClick = () => {
-        // Navigate to another page, passing selectedIds as state
+ 
         navigate('/Map', { state: { selectedIds } });
       };
     
@@ -105,7 +127,7 @@ const Home = () => {
                                         <h1 className='font-roboto text-[20px] text-[#000000] font-semibold'>Your Trips</h1>
                                     </div>
                                     <div className="w-1/2 h-full  flex justify-end items-center gap-2">
-                                        <button className="w-3/12 h-8  rounded-md border border-[#162D3A] font-roboto hover:bg-[#162D3A] hover:text-white"> Delete</button>
+                                        <button className="w-3/12 h-8  rounded-md border border-[#162D3A] font-roboto hover:bg-[#162D3A] hover:text-white"onClick={deleteTrip}> Delete</button>
                                         <button className="w-3/12 h-8 bg-[#162D3A] rounded-md text-white font-roboto hover:border hover:border-[#162D3A] hover:bg-white hover:text-black " onClick={handleOpenButtonClick}>Open</button>
                                     </div>
                                 </div>
