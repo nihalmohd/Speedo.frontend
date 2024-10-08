@@ -9,6 +9,10 @@ import Pagination from '../Pagingation/Pagination';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import axios from 'axios';
+
 
 
 
@@ -18,23 +22,76 @@ const Map = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const position = [40.7128, -74.0060];
     // Your list of names for the navbar
-    const Tripnames = ['Colaba', 'Marain drive', 'Nariman Point', 'Malabar Hills', 'Bandra', 'Anderi'];
+    const [selectedData, setSelectedData] = useState(null);
+    const [Tripnames, setTripnames] = useState([]);
     const navigate = useNavigate()
+    const location = useLocation();
+    const { selectedIds } = location.state || { selectedIds: [] };
+    console.log(
+        selectedData
+    );
+
+    const handleOpenMouting = async () => {
+        try {
+            const response = await axios.post('http://localhost:5000/getdocuments', { ids: selectedIds });
+
+            if (response) {
+                console.log('Documents received:', response.data);
+                const tripNamesArray = response.data.map((item) => ({
+                    id: item._id,
+                    tripName: item.tripName
+                }));
+                handleTripClick(response.data[0]._id)
+                setTripnames(tripNamesArray);
+
+            } else {
+                console.error('Error fetching documents:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching documents:', error);
+        }
+    };
+
+    const handleTripClick = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/gettrip/${id}`);
+
+            if (response) {
+                setSelectedData(response.data.trip); // Save fetched trip data
+            } else {
+                console.error('Error fetching trip:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching trip:', error);
+        }
+    };
+
+    useEffect(() => {
+
+        console.log('Received IDs:', selectedIds);
+        handleOpenMouting()
+    }, [selectedIds,]);
+
+    //   useEffect(()=>{
+
+    //   },[])
 
     return (
         <div>
             <Navbar />
             <div className="w-full h-auto    flex justify-center items-center">
                 <div className="w-9/12 h-full  ">
-                    <div className="w-full h-8  mt-2 " onClick={()=>{navigate('/Home')}}>
+                    <div className="w-full h-8  mt-2 " onClick={() => { navigate('/Home') }}>
                         <div className="w-10 h-8  flex justify-center items-center">
                             <h1 className='text-xl font-bold'><FaArrowLeft /></h1>
                         </div>
                     </div>
                     <div className="w-full h-16  border-2 border-[#A9A9A9] rounded-xl mt-2 flex justify-between items-center ">
 
-                        <div className="w-full h-full  flex justify-start items-center ml-3">
-                            <h1 className='font-roboto  text-[#000000D9] font-semibold '>Colaba</h1>
+                        <div className="w-full h-full flex justify-start items-center ml-3">
+                            <h1 className='font-roboto text-[#000000D9] font-semibold'>
+                                {selectedData ? selectedData.tripName : 'Loading...'}
+                            </h1>
                         </div>
                         <button className="w-2/12 h-10  flex justify-center items-center bg-[#162D3A] mr-2 rounded-md text-white font-roboto" onClick={() => { navigate("/Modal") }}>
                             New
@@ -80,17 +137,18 @@ const Map = () => {
                                     <h1 className='text-[#BFBFBF] text-[24px]'> <MdOutlineKeyboardArrowLeft /></h1>
 
                                 </div>
-                                {Tripnames.map((Tripnames, index) => (
-                                    <div key={index} className="relative ">
+                                {Tripnames.map((trip, index) => (
+                                    <div key={trip.id} className="relative ">
                                         <button
-                                            className={`text-lg font-roboto text-[12px] ${activeIndex === index ? 'text-[#1890FF]' : 'text-[#00000040]'
-                                                }`}
-                                            onClick={() => setActiveIndex(index)}
+                                            className={`text-lg font-roboto text-[12px] ${activeIndex === index ? 'text-[#1890FF]' : 'text-[#00000040]'}`}
+                                            onClick={() => {
+                                                setActiveIndex(index);
+                                                // Call your API here using trip.id
+                                                handleTripClick(trip.id);
+                                            }}
                                         >
-                                            {Tripnames}
+                                            {trip.tripName} {/* Render the tripName instead of the entire object */}
                                         </button>
-
-                                        {/* Blue line below the active name */}
                                         {activeIndex === index && (
                                             <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-600"></div>
                                         )}

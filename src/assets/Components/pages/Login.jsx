@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
@@ -7,7 +7,12 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
     
-
+    useEffect(() => {
+        const User=  localStorage.getItem("User")      
+        if(User){
+            navigate("/Home")
+        }
+        }, [])
 
     const handleSubmit = async(e) => {
         e.preventDefault(); // Prevents page reload on submit
@@ -29,7 +34,7 @@ const Login = () => {
                 email,
                 password
               });
-            localStorage.setItem("User",JSON.stringify(response.data))
+            localStorage.setItem("User",JSON.stringify(response.data.user._id,))
             console.log('Login successful:', response.data);
           } catch (error) {
             console.error('Error logging in:', error);
