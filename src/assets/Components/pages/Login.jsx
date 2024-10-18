@@ -15,9 +15,9 @@ const Login = () => {
         }, [])
 
     const handleSubmit = async(e) => {
-        e.preventDefault(); // Prevents page reload on submit
+        e.preventDefault();
   
-        // Simple validation
+       
         if (!email || !password) {
             alert("Both fields are required!");
             return;
@@ -45,8 +45,8 @@ const Login = () => {
 
     return (
         <div>
-            <div className="w-full h-screen bg-gradient-to-b from-[#AFDCB1]  to-[#82C4DA] flex justify-center items-center">
-                <div className="w-[550px] h-[400px] bg-white shadow-xl rounded-lg p-3">
+            <div className="w-full h-screen bg-gradient-to-b from-[#AFDCB1]  to-[#82C4DA] flex justify-center items-center p-1 md:p-0">
+                <div className="w-full md:w-[550px] md:h-[400px] bg-white shadow-xl rounded-lg p-3">
                     <div className="w-full h-full   ">
                         <div className="w-full h-24  mb-1 flex justify-center items-end">
                             <div className="w-1/2 h-20  flex justify-center items-end">
@@ -74,7 +74,7 @@ const Login = () => {
                                                 placeholder="you@example.com"
                                                 required
                                                 value={email}
-                                                onChange={(e) => setEmail(e.target.value)} // Updates the email state
+                                                onChange={(e) => setEmail(e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -90,7 +90,7 @@ const Login = () => {
                                                 placeholder="At least 8 characters"
                                                 required
                                                 value={password}
-                                                onChange={(e) => setPassword(e.target.value)} // Updates the password state
+                                                onChange={(e) => setPassword(e.target.value)} 
                                             />
                                         </div>
                                     </div>

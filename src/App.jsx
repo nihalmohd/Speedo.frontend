@@ -5,8 +5,6 @@ import Login from './assets/Components/pages/Login'
 import Home from './assets/Components/pages/Home'
 import Modal from './assets/Components/Modal/Modal'
 import Map from './assets/Components/pages/Map'
-import Mapintergration from './assets/Components/pages/Mapintergration'
-import ExcelDataProcessor from './assets/Components/pages/ExcelDataProcessor'
 import UserProtectedRouter from './assets/Components/ProtectedRouter/Protectedrouter'
 
 

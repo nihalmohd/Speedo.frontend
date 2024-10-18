@@ -20,9 +20,9 @@ import axios from 'axios';
 
 const Map = () => {
     const [activeIndex, setActiveIndex] = useState(0);
-    // const [position, setPosition] = useState([40.7128, -74.0060]);
-    const [position, setPosition] = useState(null); 
-    // Your list of names for the navbar
+
+    const [position, setPosition] = useState(null);
+
     const [selectedData, setSelectedData] = useState(null);
     const [Tripnames, setTripnames] = useState([]);
     const navigate = useNavigate()
@@ -36,7 +36,7 @@ const Map = () => {
     const handleOpenMouting = async () => {
         try {
             const response = await axios.post('http://localhost:5000/getdocuments', { ids: selectedIds });
-            
+
             if (response) {
                 console.log('Documents received:', response.data);
                 const tripNamesArray = response.data.map((item) => ({
@@ -45,7 +45,7 @@ const Map = () => {
                 }));
                 handleTripClick(response.data[0]._id)
                 setTripnames(tripNamesArray);
-                
+
             } else {
                 console.error('Error fetching documents:', response.status);
             }
@@ -53,13 +53,15 @@ const Map = () => {
             console.error('Error fetching documents:', error);
         }
     };
-    
+
     const handleTripClick = async (id) => {
         try {
             const response = await axios.get(`http://localhost:5000/gettrip/${id}`);
-            
+
             if (response) {
-                setSelectedData(response.data.trip); // Save fetched trip data
+                console.log(response);
+
+                setSelectedData(response.data.trip); 
             } else {
                 console.error('Error fetching trip:', response.status);
             }
@@ -74,26 +76,27 @@ const Map = () => {
         handleOpenMouting()
     }, [selectedIds,]);
 
-    //   useEffect(()=>{
-
-    //   },[])
+ 
     const formatDuration = (seconds) => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         return `${hours} hr ${minutes} min`;
     };
     const getPolylineColor = (speed, ignition) => {
-        if (ignition === 'off') return '#FF00B8'; // Pink for idle
-        if (speed > 60) return '#00FFD1'; // Skyblue for overspeed
-        return '#0038FF'; // Blue for normal driving
+        if (ignition === 'off') return '#FF00B8'; 
+        if (speed > 60) return '#00FFD1'; 
+        return '#0038FF'; 
     };
     useEffect(() => {
         if (selectedData && Array.isArray(selectedData.locations) && selectedData.locations.length > 0) {
             const firstLocation = selectedData.locations[0];
-            setPosition([firstLocation.latitude, firstLocation.longitude]); // Set the position to the first location
-            console.log('Position set to:', [firstLocation.latitude, firstLocation.longitude]); // Debugging: Check the position
+            setPosition([firstLocation.latitude, firstLocation.longitude]); 
+            console.log('Position set to:', [firstLocation.latitude, firstLocation.longitude]); 
         }
     }, [selectedData]);
+    console.log(selectedData, "this is tripnames ");
+
+
     return (
         <div>
             <Navbar />
@@ -132,17 +135,17 @@ const Map = () => {
                     </div>
                     <div className="w-full h-96 mt-2 border border-black">
                         <div className="w-full h-full">
-                            {position ? ( // Check if position is available
+                            {position ? (
                                 <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
                                     <TileLayer
                                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     />
-                                    {/* Marker for the first location */}
+                                    
                                     <Marker position={position} icon={new L.Icon({ iconUrl: 'path_to_entry_icon.png', iconSize: [25, 41] })}>
                                         <Popup>Entry Location</Popup>
                                     </Marker>
-                                    {/* Draw polylines for all locations */}
+                                    
                                     {selectedData?.locations.map((location, index) => {
                                         const nextLocation = selectedData.locations[index + 1];
                                         if (nextLocation) {
@@ -159,14 +162,14 @@ const Map = () => {
                                                 />
                                             );
                                         }
-                                        return null; // No line to draw for the last point
+                                        return null; 
                                     })}
                                 </MapContainer>
                             ) : (
-                                <div>Loading map...</div> // Loading state if position is not set
+                                <div>Loading map...</div> 
                             )}
                         </div>
-                </div>
+                    </div>
                     <div className="w-full h-16  flex items-end  ">
                         <div className="w-full h-7 flex justify-between items-center border-b-2 border-[#E0E0E0]">
                             <div className="flex  space-x-8">
@@ -177,14 +180,14 @@ const Map = () => {
                                 {Tripnames.map((trip, index) => (
                                     <div key={trip.id} className="relative ">
                                         <button
-                                            className={`text-lg font-roboto text-[12px] ${activeIndex === index ? 'text-[#1890FF]' : 'text-[#00000040]'}`}
+                                            className={`text-lg font-roboto text-[10px] ${activeIndex === index ? 'text-[#1890FF]' : 'text-[#00000040]'}`}
                                             onClick={() => {
                                                 setActiveIndex(index);
-                                                // Call your API here using trip.id
+                                                
                                                 handleTripClick(trip.id);
                                             }}
                                         >
-                                            {trip.tripName} {/* Render the tripName instead of the entire object */}
+                                            {trip.tripName} 
                                         </button>
                                         {activeIndex === index && (
                                             <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-600"></div>
@@ -269,40 +272,61 @@ const Map = () => {
                     </div>
                     <div className="overflow-x-auto mt-2 md:mt-0">
                         <table className="min-w-full border-collapse border border-gray-300">
-                            {/* Table Head */}
+                            
                             <thead>
                                 <tr className="bg-[#FAFAFA]">
                                     <th className="border border-gray-300 px-4 py-2 w-2/12 font-roboto text-[13px]">Time</th>
                                     <th className="border border-gray-300 px-4 py-2 w-52 font-roboto text-[13px]">Point</th>
                                     <th className="border border-gray-300 px-4 py-2 w-16 font-roboto text-[13px]">Ignition</th>
-                                    <th className="border border-gray-300 px-4 py-2 w-28 font-roboto text-[13px]">Speed</th>
+                                   
                                     <th className="border border-gray-300 px-4 py-2 font-roboto text-[13px]"></th>
                                 </tr>
                             </thead>
 
-                            {/* Table Body */}
-                            <tbody>
-                                <tr className="text-center">
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">11:30:24 PM</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">40.7128° N, 74.0060° W</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">On</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">28.5 KM/H</td>
-                                    <td className="px-4 py-2 font-roboto text-[12px] ">
-                                        <div className="w-full h-3 flex justify-center items-center">
-                                            Travel Duration :20 Mins
-                                        </div><div className="w-full h-3  flex justify-center items-center">
-                                            Travel Duration :20 Mins
-                                        </div>
-                                    </td>
-                                </tr>
 
-                                <tr className="text-center">
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">11:30:24 PM</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">40.7128° N, 74.0060° W</td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]"></td>
-                                    <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">28.5 KM/H</td>
-                                    {/* <td className="border border-gray-300 px-4 py-2"></td> */}
-                                </tr>
+                            <tbody>
+                                {selectedData?.locations && selectedData.locations.length > 0 ? (
+                                    selectedData.locations.map((location, index) => (
+                                        <tr key={index} className="text-center">
+                                           
+                                            <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">
+                                                {new Date(location.timestamp).toLocaleTimeString()}
+                                            </td>
+
+                                            
+                                            <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">
+                                                {`Lat: ${location.latitude.toFixed(2)}, Lon: ${location.longitude.toFixed(2)}`}
+                                            </td>
+
+                                            
+                                            <td className="border border-gray-300 px-4 py-2 font-roboto text-[12px]">
+                                                {location.ignition ? 'On' : 'Off'}
+                                            </td>
+
+                                           
+                                            <td className="px-4 py-2 font-roboto text-[12px]">
+                                                <div className="w-full h-3 flex justify-center items-center">
+                                                    Travel Duration: {formatDuration(selectedData.totalDuration)}
+                                                </div>
+                                                <div className="w-full h-3  flex justify-center items-center">
+                                                    Stopped from: {formatDuration(selectedData.stoppedDuration)}
+                                                </div>
+                                                <div className="w-full h-3  flex justify-center items-center">
+                                                    Distance: {selectedData.totalDistanceTravelled.toFixed(2)} km
+                                                </div>
+                                                <div className="w-full h-3  flex justify-center items-center">
+                                                    Overspeeding Duration: {formatDuration(selectedData.overSpeedDuration)}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-4">
+                                            No data available
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

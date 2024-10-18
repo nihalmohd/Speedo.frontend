@@ -3,7 +3,6 @@ import { GoUpload } from "react-icons/go";
 import { IoIosClose } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
-import { getDistance } from 'geolib'
 import axios from 'axios';
 
 const Modal = () => {
@@ -12,20 +11,19 @@ const Modal = () => {
     const [tripName, settripName] = useState(null);
     const [fileData, setFileData] = useState(null);
     const [report, setReport] = useState(null);
-    const speedLimit = 60; // Speed limit for over-speeding
+    const speedLimit = 60; 
 
     const userId = localStorage.getItem("User");
     console.log(tripName);
     const cleanUserId = userId.replace(/['"]/g, '');
 
-    // Trigger file input click on div click
+ 
     const handleDivClick = () => {
         if (fileInputRef.current) {
-            fileInputRef.current.click(); // Programmatically click the file input
+            fileInputRef.current.click(); 
         }
     };
 
-    // Handle file upload
     const [data, setData] = useState([]);
     const [results, setResults] = useState({
         TotalDistanceTravelled: 0,
@@ -35,9 +33,9 @@ const Modal = () => {
         stoppedDuration: 0,
     });
 
-    const [locations, setLocations] = useState([]); // State to store locations
+    const [locations, setLocations] = useState([]); 
 
-    const SPEED_LIMIT = 60; // Speed limit in km/h
+    const SPEED_LIMIT = 60; 
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -61,7 +59,7 @@ const Modal = () => {
         let overSpeedDur = 0;
         let overSpeedDist = 0;
         let stoppedDur = 0;
-        const locs = []; // Temporary array to hold locations
+        const locs = []; 
 
         let prevLat = null;
         let prevLong = null;
@@ -71,51 +69,50 @@ const Modal = () => {
         data.forEach((row, index) => {
             const { latitude, longitude, timestamp, ignition } = row;
 
-            // Check if timestamp is numeric (Excel date format)
+            
             let currentTimestamp;
             if (typeof timestamp === 'number') {
-                // Convert Excel numeric date to JS date
-                currentTimestamp = new Date((timestamp - 25569) * 86400 * 1000); // Convert Excel date to JS date
+                
+                currentTimestamp = new Date((timestamp - 25569) * 86400 * 1000); 
             } else {
-                // Handle string timestamp
+                
                 const timestampString = typeof timestamp === 'string' ? timestamp : timestamp.toString();
-                currentTimestamp = new Date(timestampString.replace(' ', 'T')); // Replace space with 'T' for proper parsing
+                currentTimestamp = new Date(timestampString.replace(' ', 'T')); 
             }
 
             if (isNaN(currentTimestamp)) {
                 console.error(`Invalid timestamp at row ${index + 1}: ${timestamp}`);
-                return; // Skip this row if the timestamp is invalid
+                return; 
             }
 
-            // Add current location to locs array
-            locs.push({ latitude, longitude });
+           
+            locs.push({ latitude, longitude, });
 
-            // Calculate distance and duration only if previous data exists
+           
             if (prevLat !== null && prevLong !== null && prevTimestamp !== null) {
-                const duration = calculateDuration(prevTimestamp, currentTimestamp); // Duration in seconds
-
-                // Check if the vehicle is stopped
+                const duration = calculateDuration(prevTimestamp, currentTimestamp); 
+                
                 if (ignition === 'off' && latitude === prevLat && longitude === prevLong) {
-                    stoppedDur += duration; // Add duration to stopped duration
+                    stoppedDur += duration; 
                 } else {
-                    // Only accumulate total distance and duration if the vehicle is moving
+                    
                     const distance = calculateDistance(prevLat, prevLong, latitude, longitude);
-                    totalDistance += distance; // Accumulate total distance
-                    totalDuration += duration; // Accumulate total duration
+                    totalDistance += distance; 
+                    totalDuration += duration; 
 
-                    // Calculate overspeed metrics
-                    const speed = (distance / (duration / 3600)); // Speed in km/h
+                    
+                    const speed = (distance / (duration / 3600)); 
                     if (speed > SPEED_LIMIT) {
-                        overSpeedDur += duration; // Accumulate duration when over speed
-                        overSpeedDist += distance; // Accumulate distance when over speed
+                        overSpeedDur += duration; 
+                        overSpeedDist += distance; 
                     }
 
-                    // If not stopped, add duration to total duration
+                    
                     totalDuration += duration;
                 }
             }
 
-            // Update previous values for next iteration
+           
             prevLat = latitude;
             prevLong = longitude;
             prevTimestamp = currentTimestamp;
@@ -130,7 +127,7 @@ const Modal = () => {
             stoppedDuration: stoppedDur,
         });
 
-        setLocations(locs); // Set locations state
+        setLocations(locs); 
         console.log(stoppedDur, "this is stopped ");
         console.log(overSpeedDist, "this is overspeed distance ");
         console.log(overSpeedDur, "this is overspeed duration ");
@@ -139,18 +136,18 @@ const Modal = () => {
     };
 
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Radius of the Earth in kilometers
+        const R = 6371; 
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in kilometers
+        return R * c; 
     };
 
     const calculateDuration = (prevTimestamp, currentTimestamp) => {
-        return (currentTimestamp - prevTimestamp) / 1000; // Duration in seconds
+        return (currentTimestamp - prevTimestamp) / 1000; 
     };
 
     const formatDuration = (seconds) => {
@@ -169,7 +166,12 @@ const Modal = () => {
                 overSpeedDuration: results.overSpeedDuration,
                 overSpeedDistance: results.overSpeedDistance,
                 stoppedDuration: results.stoppedDuration,
-                locations 
+                locations: data.map(row => ({
+                    latitude: row.latitude,
+                    longitude: row.longitude,
+                    timestamp: row.timestamp, 
+                    ignition: row.ignition,  
+                })) 
             };
 
             const response = await axios.post('http://localhost:5000/mapdata', mapData);
@@ -193,7 +195,7 @@ const Modal = () => {
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
                 <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div className="flex min-h-full items-center  justify-center p-4 text-center sm:items-center sm:p-0">
                         <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                             <div className="bg-white">
                                 <div className="w-full h-10 flex justify-end items-end">
@@ -201,7 +203,7 @@ const Modal = () => {
                                         <IoIosClose className='w-8 h-8' />
                                     </div>
                                 </div>
-                                <div className="w-full h-full px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                <div className="w-full h-full px-9 md:px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                     <form action="">
                                     <div className="w-full h-10">
                                         <input type="text" className='w-full h-full border border-[#949494] rounded-md font-roboto text-[16px] pl-2' placeholder='Trip Name*' required onChange={(e) => { settripName(e.target.value) }} />
